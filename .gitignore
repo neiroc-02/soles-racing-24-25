@@ -1,1 +1,2 @@
-/GUI/*.o
+./GUI/*.o
+./GUI/soles_racing
