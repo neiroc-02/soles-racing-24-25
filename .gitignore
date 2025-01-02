@@ -1,2 +1,4 @@
+# Ignore executables in GUI directory
 GUI/*.o
 GUI/soles_racing
+GUI/garbage
