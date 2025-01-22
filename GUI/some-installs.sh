@@ -4,5 +4,5 @@
 packages=("mosquitto" "mosquitto-clients" "libglfw3-dev" "libglfw3" "xorg-dev" "libxcb1-dev")
 for str in ${packages[@]}; 
 do
-	apt install -y $str
+	sudo apt install $str
 done
