@@ -87,3 +87,61 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -f $(EXE) $(OBJS)
+
+
+# # Compiler and Executable
+# CXX = g++
+# EXE = soles_racing
+
+# # IMGUI Directory
+# IMGUI_DIR = ./imgui
+
+# # Sources and Objects
+# SOURCES = main.cpp \
+#           $(IMGUI_DIR)/imgui.cpp \
+#           $(IMGUI_DIR)/imgui_demo.cpp \
+#           $(IMGUI_DIR)/imgui_draw.cpp \
+#           $(IMGUI_DIR)/imgui_tables.cpp \
+#           $(IMGUI_DIR)/imgui_widgets.cpp \
+#           $(IMGUI_DIR)/imgui_impl_glfw.cpp \
+#           $(IMGUI_DIR)/imgui_impl_opengl3.cpp
+
+# OBJS = $(SOURCES:.cpp=.o)
+
+# # Platform Detection
+# UNAME_S := $(shell uname -s)
+
+# # Compiler Flags and Libraries
+# CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -Wall
+# LDFLAGS = 
+# LIBS = 
+
+# ifeq ($(UNAME_S), Linux)
+#     CXXFLAGS += `pkg-config --cflags glfw3`
+#     LDFLAGS = -lGL -lm `pkg-config --static --libs glfw3`
+# endif
+
+# ifeq ($(UNAME_S), Darwin)
+#     LDFLAGS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
+#     LDFLAGS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib
+#     CXXFLAGS += -I/usr/local/include -I/opt/local/include -I/opt/homebrew/include
+# endif
+
+# ifeq ($(OS), Windows_NT)
+#     CXXFLAGS += -I/mingw64/include
+#     LDFLAGS += -L/mingw64/lib
+#     LIBS += -lglfw3 -lopengl32 -lgdi32 -limm32
+# endif
+
+# # Build Rules
+# %.o: %.cpp
+# 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# all: $(EXE)
+# 	@echo Build complete for $(UNAME_S)
+
+# $(EXE): $(OBJS)
+# 	$(CXX) -o $@ $^ $(LDFLAGS) $(LIBS)
+
+# clean:
+# 	rm -f $(EXE) $(OBJS)
