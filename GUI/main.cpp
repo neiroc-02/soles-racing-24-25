@@ -8,6 +8,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "imgui.h"
+#include "implot.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
@@ -74,6 +75,8 @@ int main(int, char**)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -109,6 +112,7 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
+    bool show_simple_data_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -162,6 +166,7 @@ int main(int, char**)
             ImGui::Text("counter = %d", counter);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
             ImGui::End();
         }
 
@@ -172,6 +177,37 @@ int main(int, char**)
             ImGui::Text("Hello from another window!");
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
+            ImGui::End();
+        }
+
+        {
+            ImGui::Begin("Data", &show_simple_data_window);
+
+            if (ImGui::BeginTable("table1", 3))
+            {
+                ImGui::TableNextColumn();
+                ImGui::Text("Speed");
+                ImGui::Text("20 mph");
+                ImGui::TableNextColumn();
+                ImGui::Text("Temperature");
+                ImGui::Text("60 F");
+                ImGui::TableNextColumn();
+                ImGui::Text("Voltage");
+                ImGui::Text("10 volts");
+                ImGui::EndTable();
+            }
+            ImGui::End();
+        }
+
+        {
+            ImGui::Begin("Implot", &show_simple_data_window);
+            ImGui::Text("Here are the graphs!");
+
+            if (ImPlot::BeginPlot("Line Plots")) {
+                ImPlot::SetupAxes("x","y");
+                ImPlot::EndPlot();
+            }
+
             ImGui::End();
         }
 
@@ -193,6 +229,7 @@ int main(int, char**)
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
