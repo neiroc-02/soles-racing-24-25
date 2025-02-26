@@ -2,7 +2,6 @@
 ## Description
 This is the repository for all the code for SOLES Racing, regarding the Arduino Code and the GUI code.
 
-
 ## Installation
 
 
@@ -25,8 +24,12 @@ make
 ```
 
 # Linux 
+Download all dependencies: `./some_installs.sh`
+
+Then create the executable: `make`
+
+Then run the executable: `./soles_racing`
 
 # Mac
-
 
 ## Usage 
