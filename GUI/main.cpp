@@ -13,6 +13,20 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <cmath>
+/* ALL MY ADDED INCLUDES */
+#include <string>
+#include <algorithm>
+#include <sstream>
+#include <chrono>
+#include <fstream>
+#include <iostream>
+#include <deque>
+#include <mutex>
+#include <thread>
+#include <unordered_map>
+#include <map>
+#include <cstring>
+/* ALL MY ADDED INCLUDES */
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -31,6 +45,51 @@
 #include "../libs/emscripten/emscripten_mainloop_stub.h"
 #endif
 
+/*-------------------------------------------*/
+/* FIXME: Data and Constants*/
+std::mutex lock; /* the lock for data sharing between the parser and GUI*/
+const std::string PIPE_PATH = "log";
+const int MAX_SIZE = 10;
+
+struct Data {
+    std::deque<double> timestamps;
+    std::deque<double> voltages;
+    std::deque<double> speeds;
+    std::deque<double> temperatures;
+} data;
+
+/* TODO: Try to set this up on a separate file?
+void parser(){
+    std::string line, device, s2, sensor;
+    std::ifstream ins(PIPE_PATH);
+    if (!ins){
+        std::cout << "Pipe failed to open!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    while(1){
+        std::this_thread::sleep_for(10ms);
+
+        std::lock_guard<std::mutex> lock(lock);
+        if (data_point == "timestamp"){
+
+        }
+        else if (data_point == "temperature"){
+
+        }
+        else if (data_point == "voltage"){
+            data.voltages.push_back();
+            if (data.voltages.size() > MAX_SIZE){
+                data.voltages.pop_front();
+            }
+        }
+        else if (data_point == "speed") {
+
+        }
+    }     
+}
+*/
+
+/*-------------------------------------------*/
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -39,6 +98,14 @@ static void glfw_error_callback(int error, const char* description)
 // Main code
 int main(int, char**)
 {
+    /* FIXME: SET UP THE ENV TO RUN THE BROKER AND GUI */
+    system((std::string("rm ") + PIPE_PATH).c_str());
+    system((std::string("mkfifo ") + PIPE_PATH).c_str());
+    system("sudo killall mosquitto_sub");
+    system("(sudo mosquitto_sub -f -t car/# > log)&");
+    std::thread t1(parser);
+    t1.detach();
+    /* ---------------------------------------------- */
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
