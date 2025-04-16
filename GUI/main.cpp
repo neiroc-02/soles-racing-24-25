@@ -16,7 +16,6 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <cmath>
-<<<<<<< HEAD
 /* ALL MY ADDED INCLUDES */
 #include <string>
 #include <algorithm>
@@ -31,13 +30,11 @@
 #include <map>
 #include <cstring>
 /* ALL MY ADDED INCLUDES */
-=======
 #include <iostream>
 #include <GL/glu.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
->>>>>>> origin
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -57,7 +54,7 @@
 
 /*-------------------------------------------*/
 /* FIXME: Data and Constants*/
-std::mutex lock; /* the lock for data sharing between the parser and GUI*/
+std::mutex dataLock; /* the lock for data sharing between the parser and GUI*/
 const std::string PIPE_PATH = "log";
 const int MAX_SIZE = 10;
 
@@ -68,8 +65,13 @@ struct Data {
     std::deque<double> temperatures;
 } data;
 
-/* TODO: Try to set this up on a separate file?
+// TODO: Try to set this up on a separate file?
 void parser(){
+    /*
+    Syntax of a PUBLISH message...
+    Client (null) recieved PUBLISH (d0, q0, r0, m0, '/car/temperature', ... (6 bytes))
+    0.08
+    */
     std::string line, device, s2, sensor;
     std::ifstream ins(PIPE_PATH);
     if (!ins){
@@ -78,13 +80,25 @@ void parser(){
     }
     while(1){
         std::this_thread::sleep_for(10ms);
+        /* Process the input with the given structure */        
+        std::string line = std::getline(ins);
+        std::cout << line << std::endl;
+        
+        std::string line2 = std::getline(ins);
+        std::count << line2 << std::endl;
 
-        std::lock_guard<std::mutex> lock(lock);
+        std::lock_guard<std::mutex> lock(dataLock);
         if (data_point == "timestamp"){
-
+            data.timestamps.push_back();
+            if (data.timestamps.size() > MAX_SIZE){
+                data.timestamps.pop_front();
+            }
         }
         else if (data_point == "temperature"){
-
+            data.temperatures.push_back();
+            if (data.temperatures.size() > MAX_SIZE){
+                data.voltages.pop_front();
+            }
         }
         else if (data_point == "voltage"){
             data.voltages.push_back();
@@ -93,11 +107,15 @@ void parser(){
             }
         }
         else if (data_point == "speed") {
-
+            data.speeds.push_back();
+            if (data.speeds.size() > MAX_SIZE){
+                data.speeds.pop_front();
+            }
         }
+        //NOTE: lock guard automatically released when out of scope
     }     
 }
-*/
+
 
 /*-------------------------------------------*/
 static void glfw_error_callback(int error, const char* description)
@@ -136,7 +154,7 @@ int main(int, char**)
     system((std::string("rm ") + PIPE_PATH).c_str());
     system((std::string("mkfifo ") + PIPE_PATH).c_str());
     system("sudo killall mosquitto_sub");
-    system("(sudo mosquitto_sub -f -t car/# > log)&");
+    system("(sudo mosquitto_sub -d -t car/# > log)&");
     std::thread t1(parser);
     t1.detach();
     /* ---------------------------------------------- */
