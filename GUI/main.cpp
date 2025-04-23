@@ -66,54 +66,83 @@ struct Data {
 } data;
 
 // TODO: Try to set this up on a separate file?
-void parser(){
-    /*
-    Syntax of a PUBLISH message...
-    Client (null) recieved PUBLISH (d0, q0, r0, m0, '/car/temperature', ... (6 bytes))
-    0.08
-    */
-    std::string line, device, s2, sensor;
+void parser() {
+    std::string line;
     std::ifstream ins(PIPE_PATH);
-    if (!ins){
+    if (!ins) {
         std::cout << "Pipe failed to open!" << std::endl;
         exit(EXIT_FAILURE);
     }
-    while(1){
-        std::this_thread::sleep_for(10ms);
-        /* Process the input with the given structure */        
-        std::string line = std::getline(ins);
-        std::cout << line << std::endl;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        // Read first line
+        if (!std::getline(ins, line))
+            continue;
+            
+        // Only process if the line contains "PUBLISH"
+        if (line.find("PUBLISH") == std::string::npos)
+            continue;
+            
+        // Extract topic between single quotes
+        size_t firstQuote = line.find("'");
+        if (firstQuote == std::string::npos)
+            continue;
+        size_t secondQuote = line.find("'", firstQuote + 1);
+        if (secondQuote == std::string::npos)
+            continue;
+        std::string topic = line.substr(firstQuote + 1, secondQuote - firstQuote - 1);
+            
+        // Tokenize topic using '/' and ignore empty tokens
+        std::stringstream ss(topic);
+        std::string token;
+        std::vector<std::string> tokens;
+        while (std::getline(ss, token, '/')) {
+            if (!token.empty())
+                tokens.push_back(token);
+        }
+        if (tokens.size() < 2)
+            continue;
+            
+        // The second token is our data_point
+        std::string data_point = tokens[1];
         
-        std::string line2 = std::getline(ins);
-        std::count << line2 << std::endl;
-
+        // Read second line and convert it to a double value
+        std::string dataLine;
+        if (!std::getline(ins, dataLine))
+            continue;
+        double value;
+        try {
+            value = std::stod(dataLine);
+        } catch (...) {
+            continue;
+        }
+        
+        // Store the value based on data_point name
         std::lock_guard<std::mutex> lock(dataLock);
-        if (data_point == "timestamp"){
-            data.timestamps.push_back();
-            if (data.timestamps.size() > MAX_SIZE){
+        if (data_point == "timestamp") {
+            data.timestamps.push_back(value);
+            if (data.timestamps.size() > MAX_SIZE)
                 data.timestamps.pop_front();
-            }
         }
-        else if (data_point == "temperature"){
-            data.temperatures.push_back();
-            if (data.temperatures.size() > MAX_SIZE){
-                data.voltages.pop_front();
-            }
+        else if (data_point == "temperature") {
+            data.temperatures.push_back(value);
+            if (data.temperatures.size() > MAX_SIZE)
+                data.temperatures.pop_front();
         }
-        else if (data_point == "voltage"){
-            data.voltages.push_back();
-            if (data.voltages.size() > MAX_SIZE){
+        else if (data_point == "voltage") {
+            data.voltages.push_back(value);
+            if (data.voltages.size() > MAX_SIZE)
                 data.voltages.pop_front();
-            }
         }
         else if (data_point == "speed") {
-            data.speeds.push_back();
-            if (data.speeds.size() > MAX_SIZE){
+            data.speeds.push_back(value);
+            if (data.speeds.size() > MAX_SIZE)
                 data.speeds.pop_front();
-            }
         }
-        //NOTE: lock guard automatically released when out of scope
-    }     
+        
+        // Optional: print out the extracted values for debugging
+        // std::cout << "data_point: " << data_point << ", value: " << value << std::endl;
+    }
 }
 
 
