@@ -181,6 +181,11 @@ GLuint LoadTexture(const char* filePath)
 int main(int, char**)
 {
     /* FIXME: SET UP THE ENV TO RUN THE BROKER AND GUI */
+    data.timestamps = std::deque<double>(10, 0.0);
+    data.voltages = std::deque<double>(10, 0.0);
+    data.temperatures = std::deque<double>(10, 0.0);
+    data.speeds = std::deque<double>(10, 0.0);
+    
     std::cerr << "Start of setup..." << std::endl;
     system((std::string("rm ") + PIPE_PATH).c_str());
     system((std::string("mkfifo ") + PIPE_PATH).c_str());
@@ -270,6 +275,7 @@ int main(int, char**)
 
 
     // Our state
+    Data newData;
     bool show_demo_window = true;
     bool show_another_window = false;
     bool show_simple_data_window = true;
@@ -345,7 +351,13 @@ int main(int, char**)
 
             if (ImGui::BeginTable("table1", 3))
             {
-                ImGui::TableNextColumn();
+		{
+        	std::lock_guard<std::mutex> lock(dataLock);	
+		newData = data;
+		}
+		ImGui::TableNextColumn();
+		ImGui::Text("Count");
+		ImGui::Text(std::to_string(newData.timestamps.at(0)).c_str());
                 ImGui::Text("Speed");
                 ImGui::Text("20 mph");
                 ImGui::TableNextColumn();
@@ -394,7 +406,6 @@ int main(int, char**)
 
             ImGui::End();
         }
-	/*
         {
             GLuint myImageTexture = LoadTexture("cardashboard.jpg");
             ImGui::Begin("Image Window");
@@ -404,7 +415,6 @@ int main(int, char**)
             }
             ImGui::End();
         }
-	*/
 
         // Rendering
         ImGui::Render();
