@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <map>
 #include <cstring>
+#include <vector>
 /* ALL MY ADDED INCLUDES */
 #include <iostream>
 #include <GL/glu.h>
@@ -141,7 +142,7 @@ void parser() {
         }
         
         // Optional: print out the extracted values for debugging
-        // std::cout << "data_point: " << data_point << ", value: " << value << std::endl;
+        std::cerr << "data_point: " << data_point << ", value: " << value << std::endl;
     }
 }
 
@@ -180,12 +181,14 @@ GLuint LoadTexture(const char* filePath)
 int main(int, char**)
 {
     /* FIXME: SET UP THE ENV TO RUN THE BROKER AND GUI */
+    std::cerr << "Start of setup..." << std::endl;
     system((std::string("rm ") + PIPE_PATH).c_str());
     system((std::string("mkfifo ") + PIPE_PATH).c_str());
     system("sudo killall mosquitto_sub");
-    system("(sudo mosquitto_sub -d -t car/# > log)&");
+    system(std::string("(sudo mosquitto_sub -d -t \"#\" > " + PIPE_PATH + ")&").c_str());
     std::thread t1(parser);
     t1.detach();
+    std::cerr << "End of setup..." << std::endl;
     /* ---------------------------------------------- */
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -391,6 +394,7 @@ int main(int, char**)
 
             ImGui::End();
         }
+	/*
         {
             GLuint myImageTexture = LoadTexture("path/to/your/image.png");
             ImGui::Begin("Image Window");
@@ -400,7 +404,7 @@ int main(int, char**)
             }
             ImGui::End();
         }
-
+	*/
 
         // Rendering
         ImGui::Render();
