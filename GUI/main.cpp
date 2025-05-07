@@ -275,7 +275,7 @@ int main(int, char**)
             ImGui::End();
         }
         {
-            GLuint myImageTexture = LoadTexture("path/to/your/image.png");
+            GLuint myImageTexture = LoadTexture("cardashboard.jpg");
             ImGui::Begin("Image Window");
             if (myImageTexture != 0) {
                 ImGui::Text("Loaded image:");
