@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
-#include <GL/glu.h>
+//#include <GL/glu.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
