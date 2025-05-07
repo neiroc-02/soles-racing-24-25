@@ -3,6 +3,19 @@
 #include <ArduinoJson.h> 
 #include <ESPping.h>
 #include "max6675.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <math.h>
+#define ONE_WIRE_BUS 7
+#define SOUND_SPEED 0.034
+#define CM_TO_INCH 0.393701
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+// ========== TEMPERATURE SENSOR ================================
+int numberSensors = 0;
+float temperature;
 
 // ========== THERMOCOUPLE SENSOR ===============================
 int thermoDO = 4;
@@ -14,8 +27,6 @@ MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 // Note: D_ corresponds to the pin number, A0 is 16, A1 is 17, etc
 const int trigPin = 8;
 const int echoPin = 9;
-#define SOUND_SPEED 0.034
-#define CM_TO_INCH 0.393701
 long duration;
 float distanceCm;
 float distanceInch;
@@ -30,12 +41,12 @@ const char WIFI_SSID[] = "SOLES_RACING";                // CHANGE TO YOUR WIFI S
 const char WIFI_PASSWORD[] = "goodlife";        // CHANGE TO YOUR WIFI PASSWORD
 const char MQTT_BROKER_ADRRESS[] = "192.168.8.117";  // CHANGE TO MQTT BROKER'S ADDRESS
 const int MQTT_PORT = 1883;
-const char MQTT_CLIENT_ID[] = "racing-esp32-001";      // CHANGE IT AS YOU DESIRE
+const char MQTT_CLIENT_ID[] = "soles";      // CHANGE IT AS YOU DESIRE
 const char MQTT_USERNAME[] = "";                          // CHANGE IT IF REQUIRED, empty if not required
 const char MQTT_PASSWORD[] = "";                          // CHANGE IT IF REQUIRED, empty if not required
 // The MQTT topics that ESP32 should publish/subscribe
-const char PUBLISH_TOPIC[] = "racing-esp32-001/loopback";    // CHANGE IT AS YOU DESIRE
-const char SUBSCRIBE_TOPIC[] = "racing-esp32-001/loopback";  // CHANGE IT AS YOU DESIRE
+const char PUBLISH_TOPIC[] = "soles";    // CHANGE IT AS YOU DESIRE
+const char SUBSCRIBE_TOPIC[] = "soles";  // CHANGE IT AS YOU DESIRE
 const int PUBLISH_INTERVAL = 1000;  // 1 second
 WiFiClient network;
 MQTTClient mqtt = MQTTClient(256);
@@ -141,10 +152,24 @@ void sendToMQTT() {
   snprintf(timestampBuffer, sizeof(timestampBuffer), "%lu", millis());
   mqtt.publish("/car/timestamp", timestampBuffer);
 
-  // Publish temperature in Celsius
-  char tempBuffer[10];
-  dtostrf(thermocouple.readCelsius(), 6, 2, tempBuffer);
-  mqtt.publish("/car/temperature", tempBuffer);
+  char tempBuffer[10] = "NaN";
+  double tempF = NAN;
+
+  // Read temperature from an analog pin
+  double val = analogRead(A1);
+  double fenya = (val / 1023.0) * 5;
+
+  if (fenya > 0.01 && fenya < 4.99) {
+    double r = (5 - fenya) / fenya * 4700;
+    double tempC = 1 / (log(r / 10000.0) / 3950 + 1 / (25 + 273.15)) - 273.15;
+
+    // Optional: sanity check on temperature range
+    if (tempC > -40 && tempC < 125) {
+      tempF = tempC * 9.0 / 5.0 + 32;
+      dtostrf(tempF, 6, 2, tempBuffer);
+      mqtt.publish("/car/temperature", tempBuffer);
+    }
+  }
 
   // Read voltage from an analog pin
   int rawADC = analogRead(A0);  
@@ -158,7 +183,7 @@ void sendToMQTT() {
   Serial.println("Sent to MQTT:");
   Serial.print("Timestamp: ");
   Serial.println(timestampBuffer);
-  Serial.print("Temperature (C): ");
+  Serial.print("Temperature (F): ");
   Serial.println(tempBuffer);
   Serial.print("Voltage: ");
   Serial.println(voltageBuffer);

@@ -32,7 +32,7 @@
 #include <vector>
 /* ALL MY ADDED INCLUDES */
 #include <iostream>
-#include <GL/glu.h>
+//#include <GL/glu.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -396,7 +396,7 @@ int main(int, char**)
         }
 	/*
         {
-            GLuint myImageTexture = LoadTexture("path/to/your/image.png");
+            GLuint myImageTexture = LoadTexture("cardashboard.jpg");
             ImGui::Begin("Image Window");
             if (myImageTexture != 0) {
                 ImGui::Text("Loaded image:");

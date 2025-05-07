@@ -54,8 +54,7 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib
-	#LIBS += -lglfw3
-	LIBS += -lglfw
+	LIBS += -lglew -lglfw
 
 	CXXFLAGS += -I/usr/local/include -I/opt/local/include -I/opt/homebrew/include
 	CFLAGS = $(CXXFLAGS)
