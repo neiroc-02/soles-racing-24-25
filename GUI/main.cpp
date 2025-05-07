@@ -301,6 +301,26 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        	
+        {
+            GLuint myImageTexture = LoadTexture("cardashboard.jpg");
+            ImGui::SetNextWindowPos(ImVec2(0, 0));
+            ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+            ImGui::Begin("Background", nullptr,
+                ImGuiWindowFlags_NoTitleBar |
+                ImGuiWindowFlags_NoResize |
+                ImGuiWindowFlags_NoMove |
+                ImGuiWindowFlags_NoScrollbar |
+                ImGuiWindowFlags_NoBringToFrontOnFocus |
+                ImGuiWindowFlags_NoInputs |
+                ImGuiWindowFlags_NoBackground); // Remove ImGui window styling
+            
+            if (myImageTexture != 0) {
+                ImGui::Image((ImTextureID)(intptr_t)myImageTexture, ImGui::GetIO().DisplaySize);
+            }
+            
+            ImGui::End();
+        }
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
@@ -394,17 +414,7 @@ int main(int, char**)
 
             ImGui::End();
         }
-	/*
-        {
-            GLuint myImageTexture = LoadTexture("cardashboard.jpg");
-            ImGui::Begin("Image Window");
-            if (myImageTexture != 0) {
-                ImGui::Text("Loaded image:");
-                ImGui::Image((ImTextureID)(intptr_t)myImageTexture, ImVec2(256, 256));
-            }
-            ImGui::End();
-        }
-	*/
+	
 
         // Rendering
         ImGui::Render();
