@@ -2,3 +2,4 @@
 GUI/*.o
 GUI/soles_racing
 GUI/garbage
+GUI/imgui.ini
