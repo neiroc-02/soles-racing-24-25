@@ -362,6 +362,8 @@ int main(int, char**)
         {
             ImGui::Begin("Data", &show_simple_data_window);
 
+            std::lock_guard<std::mutex> lock(dataLock);
+
             if (ImGui::BeginTable("table1", 3))
             {
                 ImGui::TableNextColumn();
