@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <map>
 #include <cstring>
+#include <string>
 #include <vector>
 /* ALL MY ADDED INCLUDES */
 #include <iostream>
@@ -362,21 +363,44 @@ int main(int, char**)
         {
             ImGui::Begin("Data", &show_simple_data_window);
 
-            std::lock_guard<std::mutex> lock(dataLock);
 
             if (ImGui::BeginTable("table1", 3))
             {
+		Data newData;
+		{
+            		std::lock_guard<std::mutex> lock(dataLock);
+	    		newData = data;
+		}	
                 ImGui::TableNextColumn();
+		ImGui::Text("Count");
+		if (newData.timestamps.size() >= 9) {
+			ImGui::Text(std::to_string(newData.timestamps.at(8)).c_str());
+		} else {
+			ImGui::Text("---");
+		}
+		ImGui::TableNextColumn();
                 ImGui::Text("Speed");
-                ImGui::Text("20 mph");
+		if (newData.speeds.size() >= 9){
+               		ImGui::Text(std::to_string(newData.speeds.at(8)).c_str());
+		} else {
+			ImGui::Text("---");
+		}
                 ImGui::TableNextColumn();
-                ImGui::Text("Temperature");
-                ImGui::Text("60 F");
+		ImGui::Text("Temperature");
+		if (newData.temperatures.size() >= 9) {
+                	ImGui::Text(std::to_string(newData.temperatures.at(8)).c_str());
+		} else {
+			ImGui::Text("---");
+		}
                 ImGui::TableNextColumn();
                 ImGui::Text("Voltage");
-                ImGui::Text("10 volts");
+		if (newData.voltages.size() >= 9) {
+                	ImGui::Text(std::to_string(newData.voltages.at(8)).c_str());
+		} else {
+			ImGui::Text("---");
+		}
                 ImGui::EndTable();
-            }
+	    }
             ImGui::End();
         }
 

@@ -27,7 +27,7 @@ UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
 CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR)
-CXXFLAGS += -g -Wall -Wformat -pthread # -lGLEW
+CXXFLAGS += -g -Wall -Wformat -pthread -lGLEW
 LIBS = # removed -lglw32 for Mac, still in windows
 
 ##---------------------------------------------------------------------
