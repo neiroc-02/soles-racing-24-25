@@ -274,6 +274,7 @@ int main(int, char**)
     bool show_another_window = false;
     bool show_simple_data_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    GLuint myImageTexture = LoadTexture("cardashboard.jpg");
 
     // Main loop
 #ifdef __EMSCRIPTEN__
@@ -301,9 +302,7 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        	
         {
-            GLuint myImageTexture = LoadTexture("cardashboard.jpg");
             ImGui::SetNextWindowPos(ImVec2(0, 0));
             ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
             ImGui::Begin("Background", nullptr,
